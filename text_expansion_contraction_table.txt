@@ -1,0 +1,29 @@
+Language	From English	Into English
+Albanian	+15%		-5% to -15%
+Arabic		+20% to +25%   	-20% to -25%
+Burmese		+15% 		-5% to -15%
+Catalan		+15% 		-5% to -15%
+Croatian	+15% 		-5% to -15%
+Czech		+10% 		-5% to -10%
+Danish		-10% to -15%	+10% to +15%
+Estonian	+15% 		-5% to -15%
+Finnish		-25% to -30%	+30% to +40%
+Flemish		+10% 		-5% to -10%
+French		+15% to +20%	-10% to -15%
+German		+10% to +35%	-20% to +20%
+Greek		10%  		-5% to -15%
+Hebrew		-20% to -30%	+20% to +30%
+Hindi		+15% to +35%	-15%
+Italian		+10% to +25%	-15%
+Japanese	-10% to -55%	+20% to +60%
+Korean		-10% to -15%	+15% to +20%
+Norwegian	-5% to -10%	+5% to +10%
+Polish		+20% to +30%	-5% to -15%
+Portuguese	+15% to +30%	-5% to -15%
+Russian		+15% 		-5% to -15%
+Spanish		+15% to +30%	-5% to -15%
+Swedish		-10% 		+10%
+Thai		+15%		-5% to -15%
+
+Table source: http://www.globalization-group.com/
+[BE CAREFUL:  malware has been found on that site!!!]
