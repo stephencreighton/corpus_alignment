@@ -1,5 +1,5 @@
 class XFile
-  attr_reader :filename, :source_raw, :source_words, :char_count, :word_count, :source_phrases, :phrase_length_array
+  attr_reader :filename, :source_raw, :source_words, :char_count, :word_count, :source_phrases, :phrase_length_array, :source_paragraphs, :paragraph_length_array
 
   def initialize(filename)
     @filename = filename
@@ -7,26 +7,26 @@ class XFile
     @char_count = @source_raw.length
     @source_words = @source_raw.split
     @word_count = @source_words.size
-#    @source_phrases = @source_raw.split(/\n\n/).each { |x| x.split(/((?<=[a-z0-9)][.?!;:])|(?<=[a-z0-9][.?!;:]"))\s+(?="?[a-zA-Z])/)} 
-#    zzz = @source_raw.split(/\n\n/)
-#    zzz.each do |x| 
-#      @source_phrases << x.split(/((?<=[a-z0-9)][.?!;:])|(?<=[a-z0-9][.?!;:]"))\s+(?="?[a-zA-Z])/)
-#    end
-#    @source_phrases = source_raw.split(/.;:?/)     
-#    @source_phrases = source_raw.split(/((?<=[a-z0-9)][.?!;:])|(?<=[a-z0-9][.?!;:]"))\s+(?="?[a-zA-Z])/)
     @source_phrases = source_raw.split(/(?<=[\n?.!])/)
     @phrase_length_array = []
-    build_phrases_structure
+    build_length_array(@source_phrases, @phrase_length_array)
     dump_phrases_structure
+
+    @source_paragraphs = source_raw.split(/(?<=[\n])/)
+    @paragraph_length_array = []
+    build_length_array(@source_paragraphs, @paragraph_length_array)
   end
 
-  def build_phrases_structure
+  def build_length_array (source_array, length_array)
     offset = 0
-    @source_phrases.each do |phrase|
-      @phrase_length_array << [offset, phrase.length]
-      offset += phrase.length
+    source_array.each do |item|
+      puts "-#{item}-"
+      item = item.gsub(/\s+\Z/, "")
+      puts "-#{item}-"
+      length_array << [offset, item.length]
+      offset += item.length
     end
-    
+    length_array
   end
 
   def dump_phrases_structure
@@ -41,6 +41,10 @@ class XFile
     puts @source_phrases[3]
     puts"4"
     puts @source_phrases[4]
+    puts"5"
+    puts @source_phrases[5]
+    puts"6"
+    puts @source_phrases[6]
     puts "\n@phrase_length_array:  \n"
     puts @phrase_length_array[0]
     puts @phrase_length_array[1]
