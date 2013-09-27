@@ -71,14 +71,17 @@ class Comparator
 
   def inspect
     x = (@ap_array.aligned_pairs_index * 100.0) / (from_file.pla_index * 1.0)
-    puts "Aligned #{x.round}% (#{ @ap_array.aligned_pairs_index} / #{from_file.pla_index} phrases) (of #{from_file.filename})"
+    puts "Aligned #{x.round}% (#{ @ap_array.aligned_pairs_index} / #{from_file.pla_index} phrases) of #{from_file.filename}"
     puts "Confidence score for final aligned pairs:  #{(@ap_array.aligned_pairs_cum_score / @ap_array.aligned_pairs_index * 100).round(2)}"
   end
   
   def dump_to_file
     puts "Writing to #{@ap_outfilename}"
     File.open(@ap_outfilename.to_s, 'w') do |file| 
-      file.write("Aligning #{from_file.filename} with #{to_file.filename}\n") 
+      file.write("Alignment of #{from_file.filename} with #{to_file.filename}") 
+      x = (@ap_array.aligned_pairs_index * 100.0) / (from_file.pla_index * 1.0)
+      file.write ("\nAligned #{x.round}% (#{ @ap_array.aligned_pairs_index} / #{from_file.pla_index} phrases) of #{from_file.filename}")
+      file.write ("\nConfidence score for final aligned pairs:  #{(@ap_array.aligned_pairs_cum_score / @ap_array.aligned_pairs_index * 100).round(2)}")
       file.write("\n#{@ap_array.inspect}")
     end
   end
