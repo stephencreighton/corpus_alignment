@@ -58,13 +58,21 @@ class Comparator
     last_known_match_index = 0
     from_index = 0
     to_index = 0
-#    (0..@from_file.phrase_length_array.length).each do |from_index|       ###is there a more elegant, rubyish way to do this?
-    while ( (from_index < @from_file.phrase_length_array.length) && (to_index < @to_file.phrase_length_array.length) )
-      f = @from_file.phrase_length_array[from_index]
-      t = @to_file.phrase_length_array[to_index]
-      puts "\n#{from_index}:  #{f}   #{f[1]}  #{to_index}:  #{t}" if do_puts
+    
+    
+=begin
+    while from_index < ff.pla.length
+      if f is blank, next
+      if f is title, loop through t until either match or eof, and in either case next
+      else loop through t until either match or eof, and in either case next
+    end
+#      f = @from_file.phrase_length_array[from_index]    
+=end    
+    while (from_phrase = @from_file.next_phrase)
+      to_phrase = @to_file.next_phrase
+      puts "\n#{from_file.pla_index}:  #{from_phrase}     #{to_file.pla_index}:  #{to_phrase}" if do_puts
 # length array items = [offset (characters from start of raw file), item.length, item (the actual phrase/paragraph)]
-      
+=begin      
        # remove blank lines iff they're BOTH blank
       if ((f[1] == 0) && (t[1] == 0) )
         from_index += 1
@@ -74,6 +82,12 @@ class Comparator
       end
       
       # if this is a title/subtitle, i.e. length<50 and followed by a newline
+      if (@from_file.is_title? (from_index))
+        while (! @to_file.is_title? (to_index))
+          to_index += 1
+          t = @to_file.phrase_length_array[to_index]          
+        end
+      end
       ### clean up next line
       ### actually, if a title is found in either file, try to find it in the other...if not found, throw it out and go to next index
       if ( ((f[1] > 0) && (f[1] < 50) \
@@ -84,31 +98,33 @@ class Comparator
         f_index = from_index
         t_index = to_index
         found = false
-        (0..5).each do |x|    # start with the from line, look at the next 5 to lines to see if there's a match
-          if (compare_pair(f,t) < 0.5)
-            t_index += 1
-            t = @to_file.phrase_length_array[t_index]
-            puts "\tn"
-          else
-            found = true
-            to_index = t_index
-            puts "\ty"
-            break
-          end
-        end
-        if (found == false)   # no match found there, so keep the to line, and look at the next five from lines to see if there's a match
+        if (f[1] > 0)
           (0..5).each do |x|    # start with the from line, look at the next 5 to lines to see if there's a match
             if (compare_pair(f,t) < 0.5)
-              f_index += 1
-              f = @from_file.phrase_length_array[f_index]
-            puts "\tn"                      
+              t_index += 1
+              t = @to_file.phrase_length_array[t_index]
+              puts "\tn"
             else
               found = true
-              from_index = f_index
-            puts "\ty"
+              to_index = t_index
+              puts "\ty"
               break
             end
-          end        
+          end
+        end
+          if (found == false)   # no match found there, so keep the to line, and look at the next five from lines to see if there's a match
+            (0..5).each do |x|    # start with the from line, look at the next 5 to lines to see if there's a match
+              if (compare_pair(f,t) < 0.5)
+                f_index += 1
+                f = @from_file.phrase_length_array[f_index]
+                puts "\tn"                      
+              else
+                found = true
+                from_index = f_index
+                puts "\ty"
+                break
+              end
+            end        
         end   
         if (found == true)
           @aligned_pairs << [f[2], t[2], 'TITLE', 0.8]
@@ -177,6 +193,7 @@ class Comparator
       puts "@aligned_pairs:  #{f[2]} -- #{t[2]}, 'TEXT', #{result}" if do_puts
       from_index += 1
       to_index += 1
+=end
     end
     @aligned_pairs
   end
