@@ -34,8 +34,11 @@ class AlignedPairsArray
   end
 
   def inspect
-    (0..@aligned_pairs_index).each do |x|
-      "@aligned_pairs[#{@aligned_pairs_index}]:  #{from_phrase} --> #{to_phrase}, #{type}, #{score}" 
+    s = ""
+    (0..@aligned_pairs_index-1).each do |x|
+      a = @aligned_pairs[x]
+      s << "\n[#{x}]:  #{a.from_phrase} --> #{a.to_phrase}, #{a.type}, #{a.score}" 
     end
+    s
   end
 end

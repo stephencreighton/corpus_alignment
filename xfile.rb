@@ -11,15 +11,14 @@ class PhraseArrayItem
 end
 
 class XFile
-  attr_reader :filename, :source_raw, :char_count, :source_phrases, :phrase_length_array, :pla_index
+  attr_reader :filename, :source_raw, :source_phrases, :phrase_length_array, :pla_index
   # length array items = [offset (characters from start of raw file), item.length, item (the actual phrase/paragraph)]
   def initialize(filename)
     @filename = filename
     @source_raw = File.read(filename)
-    @char_count = @source_raw.length
 
 #    @source_phrases = source_raw.split(/(?<=[\n?.!])/)    # *** this gives individual phrases
-    @source_phrases = source_raw.split(/(?<=[\n])/)       # *** this gives paragraphs
+    @source_phrases = source_raw.split(/(?<=[\n])/)       # *** this gives paragraphs - appears to work better than small phrases
     
     @phrase_length_array = []
     @pla_index = -1
@@ -42,22 +41,18 @@ class XFile
   
   def next_phrase
     @pla_index += 1
-    if (@pla_index < @phrase_length_array.length)
-      @phrase_length_array[@pla_index]
-    else
+    if (@pla_index >= @phrase_length_array.length)
       nil
+    else
+      @phrase_length_array[@pla_index]
     end
   end
   
-  def see_phrase_at(index)
-    @phrase_length_array[index]
-  end
-  
   def set_phrase_index(value)
-    if (value < @phrase_length_array.length)
-      @pla_index = value
-    else
+    if (value >= @phrase_length_array.length)
       nil
+    else
+      @pla_index = value
     end
   end
 
@@ -84,32 +79,5 @@ class XFile
     puts "Number of words: #{@source_raw.split.size}"
     puts "Number of phrases:  #{@source_phrases.size}"
     puts "Number of paragraphs:  #{@source_raw.split(/\n\n/).length}"
-  end
-
-  def blah
-    puts "---------------"
-    puts"0"
-    puts @source_phrases[0]
-    puts"1"
-    puts @source_phrases[1]
-    puts"2"
-    puts @source_phrases[2]
-    puts"3"
-    puts @source_phrases[3]
-    puts"4"
-    puts @source_phrases[4]
-    puts"5"
-    puts @source_phrases[5]
-    puts"-2"
-    puts @source_phrases[-2]
-    puts "-1"
-    puts @source_phrases[-1]
-    #    puts "\n@phrase_length_array:  \n"
-    #    puts @phrase_length_array[0]
-    #    puts @phrase_length_array[1]
-    #    puts @phrase_length_array[2]
-    #    puts @phrase_length_array[3]
-    #    puts @phrase_length_array[4]
-    #    puts "\n\n#{@phrase_length_array}\n"  
   end
 end

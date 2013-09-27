@@ -2,7 +2,7 @@ require_relative 'xfile.rb'
 require_relative 'aligned_pairs'
 
 class Comparator
-  attr_reader :overall_confidence_score  
+  attr_reader :overall_confidence_score, :ap_outfilename
   attr_accessor :text_expansion_factor, :from_file, :to_file
 
   def initialize(from_file, to_file)
@@ -11,8 +11,10 @@ class Comparator
     @to_file = to_file
     @overall_confidence_score = 0
     @text_expansion_factor = 1.20  # en to fr - will want to read this in from file?
+    @ap_outfilename = "align_#{from_file.filename}_with_#{to_file.filename}.out"
     @ap_array = AlignedPairsArray.new
     compare_structures
+    dump_to_file
   end
   
   def compare_pair(from_item, to_item)
@@ -37,9 +39,6 @@ class Comparator
   
   def compare_structures
     do_puts = false
-    last_known_match_index = 0  ###
-    from_index = 0
-    to_index = 0
     
     while (f = @from_file.next_phrase)
       t = @to_file.next_phrase
@@ -77,9 +76,10 @@ class Comparator
   end
   
   def dump_to_file
-    File.open("aligned_pairs.out", 'w') do |file| 
+    puts "Writing to #{@ap_outfilename}"
+    File.open(@ap_outfilename.to_s, 'w') do |file| 
       file.write("Aligning #{from_file.filename} with #{to_file.filename}\n") 
-      file.write("\n#{@aligned_pairs.inspect}")
+      file.write("\n#{@ap_array.inspect}")
     end
   end
 end
