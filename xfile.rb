@@ -1,5 +1,6 @@
 class XFile
-  attr_reader :filename, :source_raw, :source_words, :char_count, :word_count, :source_phrases, :phrase_length_array, :source_paragraphs, :paragraph_length_array
+  attr_reader :filename, :source_raw, :source_words, :char_count, :word_count, :source_phrases, :phrase_length_array, 
+    :source_paragraphs, :paragraph_length_array
   # length array items = [offset (characters from start of raw file), item.length, item (the actual phrase/paragraph)]
   def initialize(filename)
     @filename = filename
@@ -7,7 +8,8 @@ class XFile
     @char_count = @source_raw.length
     @source_words = @source_raw.split
     @word_count = @source_words.size
-    @source_phrases = source_raw.split(/(?<=[\n?.!])/)
+#    @source_phrases = source_raw.split(/(?<=[\n?.!])/)
+    @source_phrases = source_raw.split(/(?<=[\n])/)
     
     @phrase_length_array = []
     build_length_array(@source_phrases, @phrase_length_array)
