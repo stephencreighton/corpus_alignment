@@ -11,15 +11,15 @@ class PhraseArrayItem
 end
 
 class XFile
-  attr_reader :filename, :source_raw, :source_words, :char_count, :source_phrases, :phrase_length_array, :pla_index
+  attr_reader :filename, :source_raw, :char_count, :source_phrases, :phrase_length_array, :pla_index
   # length array items = [offset (characters from start of raw file), item.length, item (the actual phrase/paragraph)]
   def initialize(filename)
     @filename = filename
     @source_raw = File.read(filename)
     @char_count = @source_raw.length
-    @source_words = @source_raw.split
-#    @source_phrases = source_raw.split(/(?<=[\n?.!])/)
-    @source_phrases = source_raw.split(/(?<=[\n])/)
+
+#    @source_phrases = source_raw.split(/(?<=[\n?.!])/)    # *** this gives individual phrases
+    @source_phrases = source_raw.split(/(?<=[\n])/)       # *** this gives paragraphs
     
     @phrase_length_array = []
     @pla_index = -1
@@ -81,7 +81,7 @@ class XFile
   def inspect
     puts "\nMetrics for #{@filename}:"
     puts "Number of characters: #{@source_raw.length}"
-    puts "Number of words: #{@source_words.size}"
+    puts "Number of words: #{@source_raw.split.size}"
     puts "Number of phrases:  #{@source_phrases.size}"
     puts "Number of paragraphs:  #{@source_raw.split(/\n\n/).length}"
   end
