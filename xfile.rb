@@ -33,8 +33,10 @@ class XFile
     source_array.each do |item|
       item = item.gsub(/\s+\Z/, "")
       length_array << PhraseArrayItem.new(@pla_index, offset, item.length, item)
+      @pla_index += 1
       offset += item.length
     end
+    @pla_index = -1  # reset for search
     length_array
   end
   
@@ -60,11 +62,11 @@ class XFile
   end
 
   def is_title? (index)
-#    ((@length > 0) && (@length < MAX_TITLE_LENGTH) \
-#      && (@array_index+1 < @phrase_length_array.length-1) && (@phrase_length_array[index+1][1] == 0))    
-    if (index >= @phrase_length_array.length)
+    if ((index+1) >= @phrase_length_array.length)
+#puts "\t#{@filename} is_title: eof"      
       return nil
     end
+#puts ("\t#{@filename} is_title: #{@phrase_length_array[index].length}   #{@phrase_length_array[index].phrase}   next: #{@phrase_length_array[index+1].phrase}")
     ((@phrase_length_array[index].length > 0) && (@phrase_length_array[index].length < MAX_TITLE_LENGTH) \
       && (index+1 < @phrase_length_array.length-1) && (@phrase_length_array[index+1].length == 0))    
   end
