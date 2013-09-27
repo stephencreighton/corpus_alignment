@@ -1,8 +1,11 @@
-class LengthArrayItem
-  
-  def initialize(char_offset_into_raw_file, phrase_length, phrase)
+MAX_TITLE_LENGTH = 50
+
+class PhraseArrayItem
+  attr_reader :array_index, :length, :phrase
+  def initialize(array_index, char_offset_into_raw_file, phrase_length, phrase)
+    @array_index = array_index
     @offset = char_offset_into_raw_file
-    @len = phrase_length
+    @length = phrase_length
     @phrase = phrase
   end
 end
@@ -26,18 +29,13 @@ class XFile
 
   def build_length_array (source_array, length_array)
     offset = 0
+    @pla_index = 0
     source_array.each do |item|
       item = item.gsub(/\s+\Z/, "")
-      length_array << [offset, item.length, item]
+      length_array << PhraseArrayItem.new(@pla_index, offset, item.length, item)
       offset += item.length
     end
     length_array
-  end
-  
-  MAX_TITLE_LENGTH = 50
-  def is_title? (index)
-    ((@phrase_length_array[index][1] > 0) && (@phrase_length_array[index][1] < MAX_TITLE_LENGTH) \
-      && (index+1 < @phrase_length_array.length-1) && (@phrase_length_array[index+1][1] == 0))    
   end
   
   def next_phrase
@@ -49,6 +47,10 @@ class XFile
     end
   end
   
+  def see_phrase_at(index)
+    @phrase_length_array[index]
+  end
+  
   def set_phrase_index(value)
     if (value < @phrase_length_array.length)
       @pla_index = value
@@ -57,6 +59,16 @@ class XFile
     end
   end
 
+  def is_title? (index)
+#    ((@length > 0) && (@length < MAX_TITLE_LENGTH) \
+#      && (@array_index+1 < @phrase_length_array.length-1) && (@phrase_length_array[index+1][1] == 0))    
+    if (index >= @phrase_length_array.length)
+      return nil
+    end
+    ((@phrase_length_array[index].length > 0) && (@phrase_length_array[index].length < MAX_TITLE_LENGTH) \
+      && (index+1 < @phrase_length_array.length-1) && (@phrase_length_array[index+1].length == 0))    
+  end
+  
   def dump_structure
     puts "\nStructure for #{@filename}:    #{@source_phrases.length}   #{@source_raw.length}\n"
     (0..@source_phrases.length).each do |x|

@@ -1,7 +1,19 @@
 require_relative 'xfile.rb'
 
+class AlignedPairsArrayItem
+  # aligned_pairs item = [from text, to text, 'TITLE' | 'TEXT', score]
+  attr_reader :array_index, :from_phrase, :to_phrase, :type, :score
+  def initialize(array_index, from_phrase, to_phrase, type, score)
+    @array_index = array_index
+    @from_phrase = from_phrase
+    @to_phrase = to_phrase
+    @type = type
+    @score = score
+  end
+end
+
 class Comparator
-  attr_reader :aligned_pairs, :aligned_pairs_from_char_count, :overall_confidence_score  # aligned_pairs item = [from text, to text, 'TITLE' | 'TEXT', score]
+  attr_reader :aligned_pairs, :aligned_pairs_index, :aligned_pairs_from_char_count, :overall_confidence_score  
   attr_accessor :text_expansion_factor, :from_file, :to_file
 
   def initialize(from_file, to_file)
@@ -10,30 +22,21 @@ class Comparator
     @to_file = to_file
     @overall_confidence_score = 0
     @aligned_pairs = []
+    @aligned_pairs_index = -1
     @aligned_pairs_from_char_count = 0
     @text_expansion_factor = 1.20  # en to fr - will want to read this in from file?
     compare_structures
-#    (0..from_file.phrase_length_array.length).each do |x|
-#      puts "#{x}:  #{@from_file.phrase_length_array[x]}   #{@to_file.phrase_length_array[x]}  "
-#      open("aligned_pairs.out", 'a') { |f| f.puts  "#{x}:  #{@from_file.phrase_length_array[x]}   #{@to_file.phrase_length_array[x]}" }
-#    end
-#    (0..@aligned_pairs.length-1).each do |x|
-#      a = @aligned_pairs[x]
-#      puts "#{x}:  #{a}"
-#      open("aligned_pairs.out", 'a') { |f| f.puts "#{x}:  #{a}" }
-#    end
-    
+    dump_aligned_pairs
+  end
+  
+  def dump_aligned_pairs
     File.open("aligned_pairs.out", 'w') do |file| 
       file.write("Aligning #{from_file.filename} with #{to_file.filename}\n") 
       (0..@aligned_pairs.length-1).each do |x|
-        a = @aligned_pairs[x]
-  #      puts "#{x}:  #{a}"
-        file.write("\n#{x}:  #{a}")
+        file.write("\n#{x}:  #{@aligned_pairs[x]}")
       end
     end
-
   end
-  
   
   def compare_pair(from_item, to_item)
     # length array items = [offset (characters from start of raw file), item.length, item (the actual phrase/paragraph)]
@@ -68,19 +71,38 @@ class Comparator
     end
 #      f = @from_file.phrase_length_array[from_index]    
 =end    
-    while (from_phrase = @from_file.next_phrase)
-      to_phrase = @to_file.next_phrase
-      puts "\n#{from_file.pla_index}:  #{from_phrase}     #{to_file.pla_index}:  #{to_phrase}" if do_puts
-# length array items = [offset (characters from start of raw file), item.length, item (the actual phrase/paragraph)]
-=begin      
-       # remove blank lines iff they're BOTH blank
-      if ((f[1] == 0) && (t[1] == 0) )
-        from_index += 1
-        to_index += 1
-        puts "removing both blank lines" if do_puts
+    while (f = @from_file.next_phrase)
+      t = @to_file.next_phrase
+      puts "\n#{from_file.pla_index}:  #{f.length} -- #{f.phrase}     #{to_file.pla_index}:  #{t.length} -- #{t.phrase}" if do_puts
+
+      ### don't think I need this...isn't this done below?
+      if ((f.length == 0) && (t.length == 0) )   # skip blank lines iff they're BOTH blank
+        puts "skipping both blank lines" if do_puts
+        next
+      end
+
+      # if a title is found in either file, try to find it in the other...if not found, throw it out and go to next index
+      if (from_file.is_title? (f.array_index))   # if this is a title/subtitle, i.e. length<50 and followed by a newline
+        if (! to_file.is_title? (t.array_index))
+          t_index = t.array_index  # save so we can reset if we reach eof
+          while (t = @to_file.next_phrase)
+            if (to_file.is_title? (t.array_index))
+              break
+            end
+          end
+          if (t == nil)  # EOF
+            to_file.set_phrase_index(t_index)
+            next
+          end
+        end
+        
+#        @aligned_pairs << AlignedPairsArrayItem.new (f.phrase, t.phrase, 'TITLE', 0.8)
+        @aligned_pairs_from_char_count += f.phrase.length
+        puts "@aligned_pairs:  #{f.phrase} -- #{t.phrase}, 'TITLE', 0.8" if do_puts
         next
       end
       
+=begin      
       # if this is a title/subtitle, i.e. length<50 and followed by a newline
       if (@from_file.is_title? (from_index))
         while (! @to_file.is_title? (to_index))
