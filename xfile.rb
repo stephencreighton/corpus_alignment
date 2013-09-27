@@ -63,10 +63,8 @@ class XFile
 
   def is_title? (index)
     if ((index+1) >= @phrase_length_array.length)
-#puts "\t#{@filename} is_title: eof"      
       return nil
     end
-#puts ("\t#{@filename} is_title: #{@phrase_length_array[index].length}   #{@phrase_length_array[index].phrase}   next: #{@phrase_length_array[index+1].phrase}")
     ((@phrase_length_array[index].length > 0) && (@phrase_length_array[index].length < MAX_TITLE_LENGTH) \
       && (index+1 < @phrase_length_array.length-1) && (@phrase_length_array[index+1].length == 0))    
   end
