@@ -1,18 +1,4 @@
-class AlignedPairsArrayItem
-  attr_reader :array_index, :from_phrase, :to_phrase, :type, :score  # where type = 'TITLE' | 'TEXT'
-
-  def initialize(array_index, from_phrase, to_phrase, type, score)
-    @array_index = array_index
-    @from_phrase = from_phrase
-    @to_phrase = to_phrase
-    @type = type
-    @score = score
-  end
-  
-  def inspect
-    "#{@array_index}:  #{@from_phrase} -- #{@to_phrase} -- #{@type} -- #{@score}"
-  end
-end
+require_relative 'aligned_pairs_item.rb'
 
 class AlignedPairsArray
   attr_reader :aligned_pairs, :aligned_pairs_index, :aligned_pairs_from_char_count, :aligned_pairs_cum_score, :overall_confidence_score

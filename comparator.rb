@@ -10,7 +10,8 @@ class Comparator
     @from_file = from_file
     @to_file = to_file
     @overall_confidence_score = 0
-    @text_expansion_factor = 1.20  # en to fr - will want to read this in from file?
+    @text_expansion_factor = 1.20  # en to fr - will want to read this in from file...
+#    @text_expansion_factor = 2.0  # en to de 
     @ap_outfilename = "align_#{from_file.filename}_with_#{to_file.filename}.out"
     @ap_array = AlignedPairsArray.new
     compare_structures
@@ -18,7 +19,8 @@ class Comparator
   end
   
   def compare_pair(from_item, to_item)
-    # will definitely want to redo this...this just gives rough values based on standard deviations
+    # will definitely want to improve this...this just gives rough values based on standard deviations.
+    # use my new algorithm for statistical word and sentence matching
     if ( (from_file.is_title? (from_item.array_index)) && (to_file.is_title? (to_item.array_index)) )
       return 0.8
     end
@@ -38,7 +40,7 @@ class Comparator
   end
   
   def compare_structures
-    do_puts = true
+    do_puts = false
     
     while (f = @from_file.next_phrase)
       t = @to_file.next_phrase
