@@ -38,7 +38,7 @@ class Comparator
   end
   
   def compare_structures
-    do_puts = false
+    do_puts = true
     
     while (f = @from_file.next_phrase)
       t = @to_file.next_phrase

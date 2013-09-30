@@ -10,16 +10,56 @@ class PhraseArrayItem
   end
 end
 
+def sentences(text)
+  eos = "\001" # temporary end of sentence marker
+  text = text.dup
+
+  # remove random newlines
+  text.gsub(/\n/,'').length
+  # initial split after punctuation - have to preserve trailing whitespace
+  # for the ellipsis correction next
+  # would be nicer to use look-behind and look-ahead assertions to skip
+  # ellipsis marks, but Ruby doesn't support look-behind
+  text.gsub!( /([\.?!](?:\"|\'|\)|\]|\})?)(\s+)/ ) { $1 << eos << $2 }
+
+  # correct ellipsis marks and rows of stops
+  text.gsub!( /(\.\.\.*)#{eos}/ ) { $1 }
+
+  # correct abbreviations
+  # TODO - precompile this regex?
+#  text.gsub!( /(#{@@abbreviations.join("|")})\.#{eos}/i ) { $1 << '.' }
+
+  # split on EOS marker, strip gets rid of trailing whitespace
+  text.split(eos).map { | sentence | sentence.strip }
+end
+
+def create_word_distribution_array
+  words = @source_raw.split 
+  freqs=Hash.new(0) 
+  words.each { |word| freqs[word] += 1 } 
+  freqs.sort_by {|x,y| y }.reverse.each {|w, f| puts w+' '+f.to_s} 
+end
+  
+class String
+  def convert_base(from, to)
+    self.to_i(from).to_s(to)
+  end
+end
 class XFile
   attr_reader :filename, :source_raw, :source_phrases, :phrase_length_array, :pla_index
   # length array items = [offset (characters from start of raw file), item.length, item (the actual phrase/paragraph)]
   def initialize(filename)
     @filename = filename
     @source_raw = File.read(filename)
+    puts @source_raw
+    @source_raw.gsub!('\n',"")
+    @source_raw.gsub!(/(?<!\n)\n(?!\n)/, " ")
+    puts "\n\n\n"
+    puts @source_raw
+#create_word_distribution_array
 
-#    @source_phrases = source_raw.split(/(?<=[\n?.!])/)    # *** this gives individual phrases
-    @source_phrases = source_raw.split(/(?<=[\n])/)       # *** this gives paragraphs - appears to work better than small phrases
-    
+#    @source_phrases = source_raw.split(/(?<=[?.!])/)    # *** this gives individual phrases
+    @source_phrases = source_raw.split(/\n\n/)       # *** this gives paragraphs
     @phrase_length_array = []
     @pla_index = -1
     build_length_array(@source_phrases, @phrase_length_array)
